@@ -86,5 +86,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="..\README.md">
+      <Filter>Quelldateien</Filter>
+    </None>
   </ItemGroup>
 </Project>
