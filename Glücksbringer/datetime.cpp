@@ -36,47 +36,26 @@ year_month_day datetime::ymdret_today(const system_clock::time_point &tp) {
 }
 
 year_month_day datetime::ymdret_addday(const year_month_day &ymdin, int day) {
+	assert(day >= -5 && day <= 5);
 	year_month_day_last ymdl{ ymdin.year(),ymdin.month() / last };
-	if (day < 0) {
-		if (static_cast<unsigned>(ymdin.day()) + day < static_cast<unsigned>(ymdl.day())) {
-			year_month_day ymdtmp = ymdin;
-			while (day != 0) {
-				if (static_cast<unsigned>(ymdtmp.day()) == 1) {
-					ymdl -= months(1);
-					ymdtmp = ymdl.year() / ymdl.month() / ymdl.day();
-					continue;
-				}
-				int dayup = static_cast<unsigned>(ymdtmp.day());
-				dayup--; day++;
-				ymdtmp = ymdl.year() / ymdl.month() / dayup;
-			}
-		}
-		else {
-			int dayup = static_cast<unsigned>(ymdin.day()) + day;
-			year_month_day ymd = ymdin.year() / ymdin.month() / dayup;
-			return ymd;
-		}
-		
-	}
-	if (static_cast<unsigned>(ymdin.day()) + day > static_cast<unsigned>(ymdl.day())) {
-		year_month_day ymdtmp = ymdin;
-		while (day != 0) {
-			if (ymdtmp.day() == ymdl.day()) {
-				ymdl += months(1);
-				ymdtmp = ymdl.year() / ymdl.month() / 1;
-				continue;
-			}
-			int dayup = static_cast<unsigned>(ymdtmp.day());
-			dayup++; day--;
-			ymdtmp = ymdl.year() / ymdl.month() / dayup;
-		}
-	}
-	else {
-		int dayup = static_cast<unsigned>(ymdin.day()) + day;
-		year_month_day ymd = ymdin.year() / ymdin.month() / dayup;
+	int tmp = static_cast<unsigned>(ymdin.day()) + day;
+	int tmpp = static_cast<unsigned>(ymdl.day());
+	if (tmp > tmpp) {
+		day -= static_cast<unsigned>(ymdl.day()) - static_cast<unsigned>(ymdin.day());
+		ymdl += months(1);
+		year_month_day ymd = ymdl.year() / ymdl.month() / day;
 		return ymd;
 	}
-	throw "something wrong addday";
+	if (tmp + day < 1) {
+		ymdl -= months(1);
+		tmpp = static_cast<unsigned>(ymdl.day());
+		auto x = tmpp - tmp * -1;
+
+		year_month_day ymd = ymdl.year() / ymdl.month() / x;
+		return ymd;
+	}
+	year_month_day ymd = ymdin.year() / ymdin.month() / tmp;
+	return ymd;
 }
 
 string datetime::get_tp_hr(const system_clock::time_point &tp) {
