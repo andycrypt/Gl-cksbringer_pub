@@ -46,3 +46,11 @@ void Logerr::log_cout(const std::string_view& message, const std::source_locatio
     cout << tmp << endl;
 }
 
+void Logerr::log_web(const std::string_view& message, const std::chrono::year_month_day& ymd, const std::source_location& location, const std::chrono::system_clock::time_point& tp) {
+    nlohmann::json tmp;
+    tmp["Time"] = datetime::get_tp_hr(tp);
+    tmp["Message"] = message;
+    tmp["Date"] = datetime::get_formdmy(ymd);
+    Fhc::lout(d->weberr, tmp.dump());
+}
+

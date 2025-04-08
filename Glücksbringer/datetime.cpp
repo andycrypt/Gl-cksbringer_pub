@@ -82,5 +82,5 @@ void datetime::clk(year_month_day from,const year_month_day &to) {
 		dayup++;
 		from = from.year() / from.month() / dayup;
 	}
-	web::web_euromil();
+	//web::web_euromil();
 }

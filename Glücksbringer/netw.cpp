@@ -25,6 +25,8 @@
 #include "parse.h"
 #include "game.h"
 #include "log_msg.h"
+#include "datastore.h"
+#include "fhc.h"
 
 using namespace std;
 
@@ -166,5 +168,74 @@ void web::web_euromil() {
 
 
 
+}
+
+void web::web_euromilnew() {
+	//error msg store
+	boost::system::error_code ec;
+
+	// The io_context is required for all I/O
+	boost::asio::io_context ioc;
+
+
+	string host = "euro-millions.com";
+	//string port = "443";
+
+	boost::asio::ssl::context ctx(boost::asio::ssl::context::sslv23_client);
+
+	//boost::certify certificate verif -->mostly unknown, need more time
+	boost::certify::enable_native_https_server_verification(ctx);
+
+
+	// resolver & query, need for connect
+	boost::asio::ip::tcp::resolver resolver(ioc);
+
+	boost::asio::ssl::stream<boost::asio::ip::tcp::socket> v(ioc, ctx);
+	if (!SSL_set_tlsext_host_name(v.native_handle(), host.c_str())) {
+		Logerr::log_msg("SSL_set_tlsext_host_name faild");
+		throw static_cast<int>(::ERR_get_error());
+	}
+	ctx.set_default_verify_paths();
+	ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
+	ctx.set_verify_callback(boost::asio::ssl::host_name_verification(host));
+	boost::asio::connect(v.lowest_layer(), resolver.resolve(host, "https"));
+	v.lowest_layer().set_option(boost::asio::ip::tcp::no_delay(true));
+	v.handshake(boost::asio::ssl::stream_base::client);
+	for (auto& [tgt, msg, from] : ed.target) {
+		http::request<http::string_body> req{ http::verb::get, tgt, 11 };
+		req.set(http::field::host, host);
+		req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+		http::write(v, req);
+		beast::flat_buffer buffer;
+		http::response<http::dynamic_body> res;
+		http::read(v, buffer, res);
+		auto webreserr = res.result_int();
+		if (webreserr == 200) {
+			msg = boost::beast::buffers_to_string(res.body().data());
+			//cout << "ok" << endl;
+		}
+		else {
+			msg = ""; Logerr::log_web(to_string(webreserr), from);
+			//cout << webreserr << endl;
+			//--> wout dslist
+			Fhc::dslistout(from);
+		}
+	}
+	v.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+	v.shutdown(ec);
+	v.lowest_layer().cancel(ec);
+	v.lowest_layer().close();
+
+	//Stop IOC --> needet???
+	ioc.stop();
+
+	//Second loop --> process parse
+	for (const auto& [tgt, msg, from] : ed.target) {
+		if (msg.empty()) { continue; }
+		parse::htmlpars(msg, from);
+	}
+
+	//Cleanup tgt,msg store
+	ed.target.clear();
 }
 

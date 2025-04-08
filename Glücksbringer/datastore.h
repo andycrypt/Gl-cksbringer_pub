@@ -18,7 +18,7 @@ struct Datastore {
 	//std::filesystem::path gpath{ std::filesystem::current_path().generic_u8string() };
 	std::filesystem::path wrklst;
 	std::filesystem::path store,rdstrp,win_nr;
-	std::filesystem::path log, errlog;
+	std::filesystem::path log, errlog, elapsedtimelog, weberr, dslist;
 	
 };
 extern Datastore* d;

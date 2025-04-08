@@ -13,7 +13,7 @@ public:
 	//static std::string web_s(const std::string &host,const std::string &port,const std::string &target);
 	//static void get_day(const std::chrono::year_month_day &from);
 	static void web_euromil();
-
+	static void web_euromilnew();
 	static std::pair<int, int> loop_prep(size_t x) {
 		double y = static_cast<double>(x) / 10;
 		double i;

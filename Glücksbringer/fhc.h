@@ -29,4 +29,5 @@ public:
 	const std::string& ss_string(const std::stringstream &in) {
 		return in.str();
 	}
+	static void dslistout(const std::chrono::year_month_day& ymd);
 };

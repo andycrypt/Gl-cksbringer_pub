@@ -25,7 +25,8 @@ using json = nlohmann::json;
 
  void Fhc::gen_fpath() {
 	 d->wrklst = gen_gpathf("worklist.txt"); d->store = gen_gpathf("datastore.json"); d->log = gen_gpathf("log.json"); d->errlog = gen_gpathf("errlog.txt"); d->rdstrp = gen_gpathf("rand.json"); d->win_nr = gen_gpathf("win_nr.json");
-}
+	 d->elapsedtimelog = gen_gpathf("elapsedtimelog.json"); d->weberr = gen_gpathf("weberr.json"); d->dslist = gen_gpathf("dslist.json");
+ }
 
  void Fhc::prep_gpath() {
 	wstring tmp = std::filesystem::current_path().generic_wstring();
@@ -129,3 +130,11 @@ using json = nlohmann::json;
 	ss << in.rdbuf();
 	return ss.str();
 }
+
+ void Fhc::dslistout(const std::chrono::year_month_day& ymd) {
+	 fstream out{ d->dslist, ios::out | ios::app };
+	 if (!out.is_open()) {
+		 Logerr::log_msg(to_string(GetLastError()));
+	 }
+	 out << ymd << endl;
+ }

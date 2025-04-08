@@ -89,5 +89,8 @@
     <None Include="..\README.md">
       <Filter>Quelldateien</Filter>
     </None>
+    <None Include="datastore.json">
+      <Filter>Quelldateien</Filter>
+    </None>
   </ItemGroup>
 </Project>

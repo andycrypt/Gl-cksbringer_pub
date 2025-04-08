@@ -12,38 +12,32 @@ using namespace chrono;
 
 
 void Glücksbringer::start() {
-    year_month_day to = datetime::ymdret_today();
-    if (d->eurmil.size() > 0) {
+    assert(d->eurmil.size() > 0);
+    auto cnt = d->eurmil.size();
+    if (!filesystem::exists(d->dslist)) {
+        year_month_day to = datetime::ymdret_today();
         year_month_day from = d->eurmil.back().ymd;
-        if (Euromillions::to_reload()) { //modify vector & trunc file
-            for (const auto& x : ed.rld) {
-                Euromillions::web_tgt(x.ymd);
-            }
-            ed.rld.clear();
-            web::web_euromil();
-            parse::jsonfparse(true);
-            Fhc::rm(d->wrklst);
-            parse::wout_euromil(true, 0);
-        }
-        if (to > from) { // push back & app file
-            auto cnt = d->eurmil.size();
-            datetime::clk(datetime::ymdret_addday(from, 1), datetime::ymdret_addday(to, -1));
-            parse::jsonfparse(false);
-            Fhc::rm(d->wrklst);
-            if (cnt != d->eurmil.size()) {
-                parse::wout_euromil(false, cnt);
-            }
-        }
+        datetime::clk(datetime::ymdret_addday(from, 1), datetime::ymdret_addday(to, -1));
     }
     else {
-        datetime::clk(ed.superstar, datetime::ymdret_addday(to, -1));
-        parse::jsonfparse(false);
-        Fhc::rm(d->wrklst);
-        parse::wout_euromil(false, 0);
+        ifstream in{ d->dslist,in.in };
+        if (!in.is_open()) {
+            Logerr::log_msg("dslist open err");
+            //Logerr::log_msg(to_string(GetLastError())); //need win.h
+        }
+        for (string line; getline(in, line);) {
+            Euromillions::web_tgt(datetime::ymdret(line));
+        }
+        in.close();
+        Fhc::rm(d->dslist);
+    }
+    web::web_euromilnew();
+    parse::jsonfparse(false);
+    Fhc::rm(d->wrklst);
+    if (cnt != d->eurmil.size()) {
+        parse::wout_euromil(false, cnt);
     }
 }
-
-
 
 int main() {
    
