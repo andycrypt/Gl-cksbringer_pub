@@ -57,6 +57,7 @@ void parse::jsonfparse(bool reload) {
 
 void parse::jp(string inp, bool reload) {
 	auto cnt = 0;
+	bool need_reload = false;
 	Euromillions sav;
 	json j = json::parse(conv::replall(inp, "AA", ""));
 	for (const auto& [key, value] : j.items()) {
@@ -109,18 +110,20 @@ void parse::jp(string inp, bool reload) {
 			}
 			if (key.contains("Schweizer")) {
 				if (value.is_string()) {
-					if (value == "-") { wintbl.ch_w = 0; sav.need_reload = true; sav.add_wintable(wintbl); continue; }
+					if (value == "-") { wintbl.ch_w = 0; need_reload = true; sav.add_wintable(wintbl); continue; }
 					wintbl.ch_w = stoi(conv::replall(value, "'", "")); sav.add_wintable(wintbl); continue;
 				}
 				wintbl.ch_w = value;
-				sav.add_wintable(wintbl);
+				if (!need_reload) {
+					sav.add_wintable(wintbl);
+				}
 				continue;
 			}
 			if (key == "Gesamtzahl Gewinner") {
 				auto tmp = value.dump();
 				if (value.is_string()) {
 					if (tmp.contains("nicht")) { sav.add_jw(false);  wintbl.totalw = 0; continue; }
-					if (value == "-") { wintbl.totalw = 0; sav.need_reload = true; continue; }
+					if (value == "-") { wintbl.totalw = 0; need_reload = true; continue; }
 					wintbl.totalw = stoi(conv::replall(value, "'", "")); continue;
 
 				}
@@ -128,6 +131,7 @@ void parse::jp(string inp, bool reload) {
 			}
 		}
 	}
+	/*
 	if (reload) {
 		if (!sav.need_reload) {
 			for (auto& x : d->eurmil) {
@@ -138,9 +142,9 @@ void parse::jp(string inp, bool reload) {
 			}
 		}
 	}
-	else {
+	else {*/
 		d->eurmil.push_back(sav);
-	}
+	//}
 }
 
 
@@ -154,7 +158,7 @@ void parse::wout_euromil(bool trunc, size_t cnt) {
 		tmp["Star"] = x.star;
 		tmp["Superstar"] = x.superstar;
 		tmp["Jpwin"] = x.jackpot_win;
-		tmp["internal_reload"] = x.need_reload;
+		//tmp["internal_reload"] = x.need_reload;
 		int i = 0;
 		for (const auto& y : x.wintbl) {
 			tmp["Wintable"][to_string(i)].push_back(json::object_t::value_type("Nr_Hit", y.nr_hit));
@@ -173,6 +177,7 @@ void parse::wout_euromil(bool trunc, size_t cnt) {
 }
 
 void parse::imp_euromil() {
+	std::chrono::system_clock::time_point tmptp = std::chrono::system_clock::now();
 	if (exists(d->store)) {
 		ifstream in{ d->store,in.in };
 		if (!in.is_open()) {
@@ -184,11 +189,13 @@ void parse::imp_euromil() {
 			json j = json::parse(line);
 			for (auto& [key, value] : j.items()) {
 				if (key == "Date") { sav.add_ymd(datetime::ymdret(value)); continue; }
-				if (key == "Wnr") { sav.wnr.assign_range(value); continue; }
-				if (key == "Star") { sav.star.assign_range(value); continue; }
+				//if (key == "Wnr") { sav.wnr.assign_range(value); continue; }
+				if (key == "Wnr") { sav.wnr.append_range(value); continue; }
+				//if (key == "Star") { sav.star.assign_range(value); continue; }
+				if (key == "Star") { sav.star.append_range(value); continue; }
 				if (key == "Superstar") { sav.add_superstar(value); continue; }
 				if (key == "Jpwin") { sav.jackpot_win = value; continue; }
-				if (key == "internal_reload") { sav.need_reload = value; continue; }
+				//if (key == "internal_reload") { sav.need_reload = value; continue; }
 				if (key == "Wintable") {
 					for (auto& [key, value] : value.items()) {
 						Wintable wtb;
@@ -205,6 +212,7 @@ void parse::imp_euromil() {
 			d->eurmil.push_back(sav);
 		}
 	}
+	Logerr::log_msg(to_string(datetime::get_sec(tmptp)));
 }
 void parse::imp_rdnr() {
 	if (exists(d->rdstrp)) {

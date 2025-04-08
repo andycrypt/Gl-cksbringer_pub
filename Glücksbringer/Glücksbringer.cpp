@@ -5,7 +5,7 @@
 
 #include <chrono>
 #include "netw.h"
-
+#include "cassert"
 
 using namespace std;
 using namespace chrono;

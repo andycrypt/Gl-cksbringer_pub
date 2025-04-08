@@ -4,13 +4,13 @@
 #include "datastore.h"
 
 using namespace std;
-
+/*
 bool Euromillions::to_reload() {
 	for (const auto& x : d->eurmil) {
 		if (x.need_reload) { ed.rld.push_back(x); }
 	}
 	return ed.rld.size() > 0;
-}
+}*/
 
 bool Euromillions::check_playday(const year_month_day &from) {
 	return from._Calculate_weekday() == 2 || from._Calculate_weekday() == 5;

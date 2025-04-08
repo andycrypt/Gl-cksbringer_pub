@@ -34,7 +34,7 @@ public:
     string superstar;
     vector<Wintable> wintbl;
     bool jackpot_win = true;
-    bool need_reload = false;
+    //bool need_reload = false;
 
     Euromillions() = default;
     //Euromillions(const year_month_day& ymd, const vector<int>& wnr, const vector<int>& star, const string& superstar, const vector< Wintable>& wintbl, bool jackpot_win)
@@ -46,7 +46,7 @@ public:
     void add_wintable(const Wintable &wintb) { wintbl.push_back(wintb); }
     void add_jw(bool jw) { jackpot_win = false; }
     void add_ymd(const year_month_day &ymdin) { ymd = ymdin; }
-    static bool to_reload();
+    //static bool to_reload();
     static bool check_playday(const year_month_day &from);
     static void web_tgt(const year_month_day& from);
     //get position of date in datastore

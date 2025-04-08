@@ -15,7 +15,7 @@ public:
 	static std::chrono::year_month_day ymdret_today(const std::chrono::system_clock::time_point &tp = std::chrono::system_clock::now());
 	static std::chrono::year_month_day ymdret_addday(const std::chrono::year_month_day &ymdin,int day);
 	static std::string get_tp_hr(const std::chrono::system_clock::time_point &tp);
-	static std::chrono::seconds get_sec(const std::chrono::system_clock::time_point& tp);
+	static unsigned __int64 get_sec(const std::chrono::system_clock::time_point& tp);
 	int count_days() {
 
 	}

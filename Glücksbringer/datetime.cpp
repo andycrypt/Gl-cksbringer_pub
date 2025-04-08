@@ -62,8 +62,12 @@ string datetime::get_tp_hr(const system_clock::time_point &tp) {
 	return format("{:%d.%m.%Y %X}", tp);
 }
 
-seconds datetime::get_sec(const std::chrono::system_clock::time_point& tp) {
-	return std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - tp);
+unsigned __int64 datetime::get_sec(const std::chrono::system_clock::time_point& tp) {
+	seconds tmps = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - tp);
+	if (tmps.count() == 0) {
+		return std::chrono::duration_cast<std::chrono::microseconds>(system_clock::now() - tp).count();
+	}
+	return tmps.count();
 }
 
 void datetime::clk(year_month_day from,const year_month_day &to) {
