@@ -110,7 +110,7 @@ void statistics::optimize_play_eurmil(const year_month_day& from, const year_mon
 	vector<Tip> tips;
 	auto tmp = dig.size();
 	auto tmps = sv.size();
-	tips.push_back(Tip(dig[tmp - 1].dig1, dig[tmp - 1].dig1, dig[tmp - 2].dig1, dig[tmp - 3].dig1, dig[tmp - 4].dig1,sv[tmps-1].dig1, sv[tmps - 2].dig1));
+	tips.push_back(Tip(dig[tmp - 1].dig1, dig[tmp - 2].dig1, dig[tmp - 3].dig1, dig[tmp - 4].dig1, dig[tmp - 5].dig1,sv[tmps-1].dig1, sv[tmps - 2].dig1));
 	int tip = tips.size();
 
 	for (const auto& x : ranges::subrange(d->eurmil.begin() + Euromillions::get_pd(1d / 1 / 2024), d->eurmil.begin() + Euromillions::get_pd(datetime::ymdret_addday(datetime::ymdret_today(), -1)))) {
